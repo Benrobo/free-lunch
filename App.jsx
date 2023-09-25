@@ -78,7 +78,7 @@ const MainComponent = () => {
     return <SplashScreen />;
   }
 
-  if (true) {
+  if (isLoggedIn) {
     return <RootNavigator />;
   } else return <AuthNavigator />;
 };

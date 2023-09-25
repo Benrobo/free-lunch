@@ -5,11 +5,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import DataContext from "../context/DataContext";
 import HomeStackScreen from "./ScreenStacks/HomeStackScreen";
 import { Text, View } from "react-native";
-import { Entypo, Feather, AntDesign } from "@expo/vector-icons";
+import {
+  Entypo,
+  Feather,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import tw from "../config/tailwind";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function RootNavigator() {
@@ -18,26 +24,52 @@ function RootNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="MainHome"
-        tabBar={(prop) => <MyTabBar {...prop} />}
+        initialRouteName="Home1"
+        activeColor="#7C149B"
+        barStyle={{ backgroundColor: "#fff" }}
       >
         <Tab.Screen
-          name="MainHome"
+          name="Home1"
           component={HomeStackScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        {/* <Tab.Screen
-          name="Transactions"
-          // component={TransactionStackScreen}
-          options={{ headerShown: false }}
+          options={({ route }) => ({
+            tabBarLabel: ({ focused }) => (
+              <Text style={console.log({ route, focused })}>Home</Text>
+            ),
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="home" color={color} size={26} />
+            ),
+          })}
         />
         <Tab.Screen
-          name="Settings"
-          // component={SettingstackScreen}
-          options={{ headerShown: false }}
-        /> */}
+          name="Employees1"
+          component={HomeStackScreen}
+          options={{
+            tabBarLabel: (
+              <Text style={([tw``], { fontFamily: "ppSB", fontSize: 15 })}>
+                Employees
+              </Text>
+            ),
+            fontFamily: "ppSB",
+            tabBarIcon: ({ color }) => (
+              <Feather name="users" color={color} size={26} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile1"
+          component={HomeStackScreen}
+          options={{
+            tabBarLabel: (
+              <Text style={([tw``], { fontFamily: "ppSB", fontSize: 15 })}>
+                Profile
+              </Text>
+            ),
+            fontFamily: "ppSB",
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="user" color={color} size={26} />
+            ),
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
@@ -78,6 +110,8 @@ function MyTabBar({ state, descriptors, navigation }) {
             target: route.key,
           });
         };
+
+        console.log({ label });
 
         return (
           <TouchableOpacity
@@ -124,7 +158,7 @@ function returnIconName(name, isFocused) {
   let routeName = name.toLowerCase();
   const size = 15;
 
-  if (routeName === "home")
+  if (routeName === "Home1")
     icon = (
       <Entypo
         name="home"
@@ -132,15 +166,15 @@ function returnIconName(name, isFocused) {
         color={isFocused ? "#7C149B" : "#A3A3A3"}
       />
     );
-  if (routeName === "transactions")
+  if (routeName === "Employees")
     icon = (
       <Feather
-        name="employees"
+        name="users"
         size={size}
         color={isFocused ? "#7C149B" : "#A3A3A3"}
       />
     );
-  if (routeName === "profile")
+  if (routeName === "Profile1")
     icon = (
       <AntDesign
         name="user"
