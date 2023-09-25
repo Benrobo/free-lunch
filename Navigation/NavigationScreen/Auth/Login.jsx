@@ -16,16 +16,19 @@ import { useMutation } from "react-query";
 import { isEmpty, sleep } from "../../../utils";
 import CustomToast from "../../../components/Notification/Toast";
 import DataContext from "../../../context/DataContext";
+import { HandleLoginResponse } from "../../../utils/response";
+import { login } from "../../../http";
 
 const lunchNotif = new CustomToast(150, 3);
 
 function LoginScreen({ navigation }) {
-  const {} = useContext(DataContext);
+  const { setIsLoggedIn } = useContext(DataContext);
   const [showLunchToast, setShowLunchToast] = React.useState(false);
   const [toastInfo, setToastInfo] = useState({
     msg: "",
     title: "",
   });
+  const [successFulLogin, setSuccessFulLogin] = useState(false);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [details, setDetails] = useState({
@@ -49,6 +52,7 @@ function LoginScreen({ navigation }) {
 
   useEffect(() => {
     const { data, error } = loginMutation;
+    console.log({ error, data });
     if (typeof data !== "undefined" || error !== null) {
       const response = data;
       HandleLoginResponse(response, clearMutationState, () =>
@@ -56,6 +60,12 @@ function LoginScreen({ navigation }) {
       );
     }
   }, [loginMutation.data, loginMutation.error]);
+
+  useEffect(() => {
+    if (successFulLogin) {
+      setIsLoggedIn(true);
+    }
+  }, [successFulLogin]);
 
   async function handleLogin() {
     if (isEmpty(details.email)) {
@@ -139,8 +149,9 @@ function LoginScreen({ navigation }) {
               style={tw`w-full flex flex-col items-center justify-center gap-5`}
             >
               <TouchableOpacity
-                style={tw`min-w-full min-h-[50px] flex items-center justify-center rounded-[10px] bg-purple-100 text-center py-3 px-5  bg-purple-100`}
+                style={tw`min-w-full min-h-[60px] flex items-center justify-center rounded-[10px] bg-purple-100 text-center py-4 px-5  bg-purple-100`}
                 onPress={handleLogin}
+                disabled={loginMutation.isLoading}
               >
                 {!loginMutation.isLoading ? (
                   <Text

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import tw from "./config/tailwind";
 import SplashScreen from "./components/SplashScreen";
 import { useDeviceContext } from "twrnc";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { sleep } from "./utils";
 import RootNavigator from "./Navigation/RootNavigator";
 import AuthNavigator from "./Navigation/AuthNavigator";
@@ -16,7 +16,7 @@ import {
   Poppins_600SemiBold,
 } from "@expo-google-fonts/poppins";
 import "react-native-gesture-handler";
-import { DataContextProvider } from "./context/DataContext";
+import DataContext, { DataContextProvider } from "./context/DataContext";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { NotifierWrapper } from "react-native-notifier";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -62,8 +62,9 @@ export default function App() {
 
 const MainComponent = () => {
   const [splashLoading, setSplashLoading] = useState(true);
-  // const { isLoggedIn } = useContext(DataContext);
-  const isLoggedIn = false;
+  const { isLoggedIn } = useContext(DataContext);
+
+  console.log({ isLoggedIn });
 
   useEffect(() => {
     async function prepare() {
@@ -77,7 +78,7 @@ const MainComponent = () => {
     return <SplashScreen />;
   }
 
-  if (isLoggedIn) {
+  if (true) {
     return <RootNavigator />;
   } else return <AuthNavigator />;
 };

@@ -16,14 +16,12 @@ export function DataContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated(jwtToken));
 
   useEffect(() => {
-    async () => {
-      const token = await Storage.getItem("@auth_token");
-      const userData = await Storage.getItem("@user_data");
-      const validToken = isAuthenticated(token);
-      setJwtToken(token);
-      setIsLoggedIn(validToken);
-      setUserData(userData);
-    };
+    const token = Storage.getItem("token");
+    const userData = Storage.getItem("userData");
+    const validToken = isAuthenticated(token);
+    setIsLoggedIn(validToken);
+    setUserData(userData);
+    console.log({ validToken });
   }, []);
 
   useEffect(() => {}, []);

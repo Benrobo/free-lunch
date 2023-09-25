@@ -1,6 +1,8 @@
 import CustomToast from "../components/Notification/Toast";
+import LocalStorage from "./localstorage";
 
 const lunchNotif = new CustomToast(150, 3);
+const storage = new LocalStorage();
 
 const checkServerError = (response, resetState, cancelRefreshing) => {
   if (response?.message === "Network Error") {
@@ -32,63 +34,30 @@ const checkServerError = (response, resetState, cancelRefreshing) => {
 // login
 export function HandleLoginResponse(response, resetState, successFulLogin) {
   console.log(response);
-  return;
-  if (response?.code === "--auth/user-notfound") {
-    lunchNotif.error("Account Not Found");
-    resetState();
-    return;
-  }
-
-  if (["--auth/invalid-fields", ""].includes(response?.message)) {
-    lunchNotif.error(response?.message);
-    resetState();
-    return;
-  }
-  if (response?.code === "--auth/password-incorrect") {
-    lunchNotif.error("Incorrect Password", {
+  const statusCode = response?.statusCode;
+  const errorCodes = [400, 422, 300, 404, 500, 403];
+  const successCodes = [200, 201];
+  if (errorCodes.includes(statusCode)) {
+    lunchNotif.error("Error Logging In", {
       description: response?.message,
     });
     resetState();
     return;
   }
-  if (response?.code === "--auth/logged-in") {
-    resetState();
-    // return;
-    const {
-      emailVerified,
-      email,
-      _id,
-      image,
-      token,
-      username,
-      fullname,
-      accountVerified,
-      hasAppLockPin,
-      hasPaymentPin,
-    } = response?.data;
-
-    const authToken = token;
-    const userData = {
-      emailVerified,
-      _id,
-      image,
-      email,
-      username,
-      fullname,
-      accountVerified,
-      hasAppLockPin,
-      hasPaymentPin,
-    };
-
-    console.log({ userData });
-
-    Storage.setItem("paycode_user_data", userData);
-    Storage.setItem("paycode_auth_token", authToken);
-    Storage.removeItem("temp_user_mail");
-    successFulLogin();
+  if (successCodes.includes(statusCode)) {
+    const { access_token, id, name, is_admin } = response?.data;
+    (async () => {
+      await storage.setItem("token", access_token);
+      await storage.setItem("userData", {
+        id,
+        name,
+        is_admin,
+      });
+      resetState();
+      successFulLogin();
+    })();
   }
-
   // api server error
   checkServerError(response, resetState);
-  checkInvalidToken(response, resetState);
+  //   checkInvalidToken(response, resetState);
 }

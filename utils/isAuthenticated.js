@@ -5,8 +5,8 @@ import LocalStorage from "./localstorage";
 const Storage = new LocalStorage();
 
 const clearLocalStorage = async () => {
-  await Storage.removeItem("@auth_token");
-  await Storage.removeItem("@user_data");
+  await Storage.removeItem("token");
+  await Storage.removeItem("userData");
   console.log(`Storage cleared.`);
 };
 

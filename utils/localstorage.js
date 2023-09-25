@@ -11,7 +11,7 @@ export default class LocalStorage {
 
   async getItem(key) {
     try {
-      const value = SecureStore.getItemAsync(key);
+      const value = await SecureStore.getItemAsync(key);
       return value === null || typeof value === "undefined"
         ? null
         : JSON.parse(value);

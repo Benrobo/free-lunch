@@ -1,6 +1,6 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios from "axios";
 import LocalStorage from "../utils/localstorage";
-import { isEmpty } from "../util";
+import { isEmpty } from "../utils";
 
 const baseURL = "https://free-lunch-j9obk.ondigitalocean.app/api";
 const Storage = new LocalStorage();
@@ -16,7 +16,7 @@ const $http = axios.create({
 });
 
 $http.interceptors.request.use(async (req) => {
-  let token = await Storage.getItem("@auth_token");
+  let token = await Storage.getItem("token");
   if (!isEmpty(token)) {
     req.headers["Authorization"] = `Bearer ${token}`;
   }
