@@ -7,7 +7,10 @@ import tw from "../config/tailwind";
 function Layout({ children, useSafeAreaView, statusBarColor }) {
   return (
     <View>
-      <StatusBar backgroundColor={statusBarColor ?? "#7C149B"} />
+      <StatusBar
+        backgroundColor={statusBarColor ?? "#fff"}
+        barStyle="dark-content"
+      />
       {useSafeAreaView ? (
         <SafeAreaView style={tw`w-full bg-dark2-100`}>
           <View style={tw`w-full h-screen bg-white-105`}>{children}</View>

@@ -16,6 +16,12 @@ import {
   Poppins_600SemiBold,
 } from "@expo-google-fonts/poppins";
 import "react-native-gesture-handler";
+import { DataContextProvider } from "./context/DataContext";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { NotifierWrapper } from "react-native-notifier";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+const queryClient = new QueryClient();
 
 export default function App() {
   useDeviceContext(tw);
@@ -41,7 +47,15 @@ export default function App() {
   }
   return (
     <Layout>
-      <MainComponent />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <QueryClientProvider client={queryClient}>
+          <DataContextProvider>
+            <NotifierWrapper>
+              <MainComponent />
+            </NotifierWrapper>
+          </DataContextProvider>
+        </QueryClientProvider>
+      </GestureHandlerRootView>
     </Layout>
   );
 }

@@ -13,17 +13,17 @@ export default class LunchToast {
     const [containerVisibility, setContainerVisibility] = React.useState(false);
 
     React.useEffect(() => {
-      if (this.visibility === true) {
+      if (this.visibility) {
         setContainerVisibility(true);
       }
-    }, [this.visibility]);
+    }, [this.visibility, this.onPress]);
 
     return (
       <Container visibility={containerVisibility}>
         <ToastBox
           visibility={this.visibility}
           message={msg}
-          type={title}
+          title={title}
           onPressFunc={this.onPress}
           setContainerVisibility={setContainerVisibility}
         />
@@ -94,7 +94,7 @@ function ToastBox({
           },
         ]}
       >
-        {title ?? "Title"}
+        {title}
       </Text>
       <Text
         style={[
@@ -128,7 +128,7 @@ function Container({ children, visibility }) {
   return (
     <View
       style={[
-        tw`w-full mx-auto h-full flex flex-col items-center justify-center absolute bottom-[100px] z-[10000] flex flex-col items-center justify-end transition `,
+        tw`w-full mx-auto h-full flex flex-col items-center justify-center absolute bottom-[100px] z-[10000] flex flex-col items-center justify-end `,
       ]}
     >
       {children}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import Layout from "../../../components/Layout";
 import TopBar from "../../../components/TopBar";
@@ -11,21 +11,71 @@ import Gap from "../../../components/Gap";
 import tw from "../../../config/tailwind";
 import { Octicons } from "@expo/vector-icons";
 import LunchToast from "../../../components/Toast";
+import { LoaderScreen, Spinner } from "../../../components/Loader";
+import { useMutation } from "react-query";
+import { isEmpty, sleep } from "../../../utils";
+import CustomToast from "../../../components/Notification/Toast";
+import DataContext from "../../../context/DataContext";
+
+const lunchNotif = new CustomToast(150, 3);
 
 function LoginScreen({ navigation }) {
+  const {} = useContext(DataContext);
   const [showLunchToast, setShowLunchToast] = React.useState(false);
+  const [toastInfo, setToastInfo] = useState({
+    msg: "",
+    title: "",
+  });
   const [isPwdVisible, setIsPwdVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [details, setDetails] = useState({
+    email: "",
+    password: "",
+  });
+  const loginMutation = useMutation(async (data) => await login(data));
 
   const navigateToSignup = () => navigation.push("Signup");
+  const handleInputChange = (type, val) =>
+    setDetails((prev) => ({ ...prev, [type]: val }));
 
   const lunchToast = new LunchToast(
     () => setShowLunchToast(false),
     showLunchToast
   );
 
+  const clearMutationState = () => {
+    loginMutation.reset();
+  };
+
+  useEffect(() => {
+    const { data, error } = loginMutation;
+    if (typeof data !== "undefined" || error !== null) {
+      const response = data;
+      HandleLoginResponse(response, clearMutationState, () =>
+        setSuccessFulLogin(true)
+      );
+    }
+  }, [loginMutation.data, loginMutation.error]);
+
+  async function handleLogin() {
+    if (isEmpty(details.email)) {
+      lunchNotif.error("Email is required");
+      return;
+    }
+    if (isEmpty(details.password)) {
+      lunchNotif.error("Password is required");
+      return;
+    }
+    loginMutation.mutate(details);
+  }
+
   return (
     <>
       <TopBar title="Sign In" onClick={() => navigation.navigate("BaseAuth")} />
+
+      {/* loader */}
+      {loading && <LoaderScreen />}
+
       <Layout useSafeAreaView={true}>
         <ScrollView
           style={[
@@ -51,6 +101,7 @@ function LoginScreen({ navigation }) {
                   { fontFamily: "ppSB" },
                 ]}
                 selectionColor={"#777"}
+                onChangeText={(txt) => handleInputChange("email", txt)}
               />
             </View>
 
@@ -80,6 +131,7 @@ function LoginScreen({ navigation }) {
                 selectionColor={"#777"}
                 placeholder=""
                 secureTextEntry={!isPwdVisible}
+                onChangeText={(txt) => handleInputChange("password", txt)}
               />
             </View>
             <Gap h={200} />
@@ -87,17 +139,21 @@ function LoginScreen({ navigation }) {
               style={tw`w-full flex flex-col items-center justify-center gap-5`}
             >
               <TouchableOpacity
-                style={tw`min-w-full min-h-[60px] flex items-center justify-center rounded-[10px] bg-purple-100 text-center py-4 px-5  bg-purple-100`}
-                onPress={() => navigate("Login")}
+                style={tw`min-w-full min-h-[50px] flex items-center justify-center rounded-[10px] bg-purple-100 text-center py-3 px-5  bg-purple-100`}
+                onPress={handleLogin}
               >
-                <Text
-                  style={[
-                    { fontFamily: "ppSB" },
-                    tw`text-white-100 text-center leading-[19px] text-[16px] `,
-                  ]}
-                >
-                  Sign In
-                </Text>
+                {!loginMutation.isLoading ? (
+                  <Text
+                    style={[
+                      { fontFamily: "ppSB" },
+                      tw`text-white-100 text-center leading-[19px] text-[16px] `,
+                    ]}
+                  >
+                    Sign In
+                  </Text>
+                ) : (
+                  <Spinner color={"#fff"} size="small" />
+                )}
               </TouchableOpacity>
               <View
                 style={[
@@ -127,7 +183,7 @@ function LoginScreen({ navigation }) {
         </ScrollView>
 
         {/* Alert message */}
-        {lunchToast.show("Message", "title")}
+        {lunchToast.show(toastInfo.msg, toastInfo.title)}
       </Layout>
     </>
   );
